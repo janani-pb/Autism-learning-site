@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Links to Light - Kids Adventure Portal</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700&display=swap');
+        
+        :root {
+            --primary: #FF6B6B;
+            --secondary: #4FC3F7;
+            --accent: #FFD166;
+        }
+        
+        body {
+            font-family: 'Baloo 2', cursive;
+            background-color: #E6F7FF;
+            margin: 0;
+            padding: 0;
+            background-image: 
+                radial-gradient(circle at 10% 20%, #FFEBEE 0%, #E6F7FF 90%),
+                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="%234FC3F7" opacity="0.5"/></svg>');
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+        }
+        
+        .adventure-container {
+            width: 90%;
+            max-width: 700px;
+            margin: 20px;
+            background: white;
+            padding: 40px;
+            border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(0, 150, 255, 0.3);
+            border: 6px solid var(--accent);
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+        
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            margin: 15px 0;
+            font-size: 3.5rem;
+            background: linear-gradient(45deg, var(--primary), #FF8A65);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.1);
+            line-height: 1.2;
+        }
+        
+        .subtitle {
+            color: #5D5D5D;
+            margin-bottom: 40px;
+            font-size: 1.5rem;
+        }
+        
+        .main-logo {
+            width: 180px;
+            margin: 20px auto;
+            animation: bounce 2s infinite;
+            filter: drop-shadow(0 6px 10px rgba(0,0,0,0.25));
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) rotate(-5deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+        
+        .form-group {
+            margin-bottom: 30px;
+            text-align: left;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: #5D5D5D;
+            font-size: 1.3rem;
+        }
+        
+        input {
+            width: 100%;
+            padding: 18px;
+            border: 4px solid var(--secondary);
+            border-radius: 18px;
+            font-size: 1.2rem;
+            background-color: #F5FDFF;
+            transition: all 0.3s;
+            font-family: 'Baloo 2', cursive;
+            margin-bottom: 10px;
+        }
+        
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.4);
+            outline: none;
+        }
+        
+        .power-levels {
+            display: flex;
+            justify-content: space-between;
+            margin: 30px 0;
+            gap: 20px;
+        }
+        
+        .level-option {
+            flex: 1;
+            background-color: #E1F5FE;
+            padding: 20px;
+            border-radius: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 4px solid transparent;
+            text-align: center;
+            min-width: 0;
+        }
+        
+        .level-option:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        
+        .level-option.selected {
+            background-color: var(--secondary);
+            border-color: var(--primary);
+            color: white;
+            transform: scale(1.05);
+        }
+        
+        .level-option img {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 15px;
+        }
+        
+        .level-option span {
+            display: block;
+            font-weight: bold;
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+        }
+        
+        .level-option small {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+        
+        .age-selection {
+            display: none;
+            margin-top: 40px;
+            animation: fadeIn 0.7s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .age-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .age-option {
+            background-color: #FFEBEE;
+            padding: 20px;
+            border-radius: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 4px solid transparent;
+            text-align: center;
+        }
+        
+        .age-option:hover {
+            transform: scale(1.08);
+        }
+        
+        .age-option.selected {
+            background-color: var(--primary);
+            border-color: var(--accent);
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        .age-option img {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 15px;
+        }
+        
+        .age-option span {
+            display: block;
+            font-weight: bold;
+            font-size: 1.3rem;
+        }
+        
+        .start-button {
+            background: linear-gradient(45deg, var(--primary), #FF8A65);
+            color: white;
+            border: none;
+            padding: 25px;
+            width: 100%;
+            font-size: 1.8rem;
+            border-radius: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            margin-top: 40px;
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.5);
+            font-family: 'Baloo 2', cursive;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .start-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 25px rgba(255, 107, 107, 0.6);
+        }
+        
+        .start-button:active {
+            transform: translateY(2px);
+        }
+        
+        .start-button::after {
+            content: '⚡';
+            position: absolute;
+            right: 30px;
+            animation: sparkle 1s infinite;
+            font-size: 1.5rem;
+        }
+        
+        @keyframes sparkle {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.8; }
+        }
+        
+        .adventure-character {
+            position: fixed;
+            transition: all 0.6s ease;
+            z-index: 5;
+            filter: drop-shadow(0 6px 12px rgba(0,0,0,0.4));
+            pointer-events: none;
+        }
+        
+        #explorer {
+            width: 200px;
+            bottom: 30px;
+            left: 30px;
+            animation: float 4s ease-in-out infinite;
+        }
+        
+        #robot {
+            width: 180px;
+            top: 30px;
+            right: 30px;
+            animation: float 5s ease-in-out infinite 1s;
+        }
+        
+        #dino {
+            width: 220px;
+            bottom: 120px;
+            right: 40px;
+            animation: float 3.5s ease-in-out infinite 0.5s;
+        }
+        
+        #alien {
+            width: 160px;
+            top: 120px;
+            left: 40px;
+            animation: float 4.5s ease-in-out infinite 1.5s;
+        }
+        
+        #unicorn {
+            width: 240px;
+            bottom: 180px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: float 5.5s ease-in-out infinite 0.7s;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(-5deg); }
+            50% { transform: translateY(-25px) rotate(5deg); }
+        }
+        
+        .adventure-bg {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><circle cx="100" cy="100" r="2" fill="%234FC3F7" opacity="0.3"/></svg>');
+        }
+        
+        @media (max-width: 768px) {
+            .adventure-container {
+                padding: 30px 20px;
+                margin: 15px;
+                width: 85%;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
+                margin-bottom: 30px;
+            }
+            
+            .main-logo {
+                width: 140px;
+            }
+            
+            .power-levels {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .level-option {
+                padding: 15px;
+            }
+            
+            .level-option img {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .age-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+            
+            .adventure-character {
+                width: 120px !important;
+            }
+            
+            #unicorn {
+                width: 150px !important;
+                bottom: 100px;
+            }
+            
+            #dino {
+                width: 150px !important;
+                bottom: 80px;
+                right: 20px;
+            }
+            
+            .start-button {
+                padding: 20px;
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="adventure-bg"></div>
+    
+    <div class="adventure-container">
+        <img src="https://img.icons8.com/color/192/000000/treasure-chest.png" alt="Treasure Chest" class="main-logo">
+        <h1>Links to Light</h1>
+        <div class="subtitle">Your Magical Learning Adventure</div>
+        
+        <form id="adventureForm">
+            <div class="form-group">
+                <label for="heroName">Adventurer's Name</label>
+                <input type="text" id="heroName" placeholder="What's your explorer name?" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="secretCode">Magic Password</label>
+                <input type="password" id="secretCode" placeholder="Your secret spell..." required>
+            </div>
+            
+            <div class="form-group">
+                <label>Choose Your Adventure Level</label>
+                <div class="power-levels">
+                    <div class="level-option" onclick="selectLevel(1)">
+                        <img src="level1.jpg" alt="Level 1">
+                        <span>Trail Blazer</span>
+                        <small>New to adventures</small>
+                    </div>
+                    <div class="level-option" onclick="selectLevel(2)">
+                        <img src="level2.jpg" alt="Level 2">
+                        <span>Mountain Climber</span>
+                        <small>Ready for challenges</small>
+                    </div>
+                    <div class="level-option" onclick="selectLevel(3)">
+                        <img src="level3.jpg" alt="Level 3">
+                        <span>Dragon Rider</span>
+                        <small>Master adventurer</small>
+                    </div>
+                    <input type="hidden" id="adventureLevel" name="adventureLevel" value="">
+                </div>
+            </div>
+            
+            <div class="age-selection" id="ageSelection">
+                <label>How Many Winters Have You Seen?</label>
+                <div class="age-grid">
+                    <div class="age-option" onclick="selectAge(5)">
+                        <img src="https://img.icons8.com/color/144/000000/5.png" alt="5 years">
+                        <span>5 Years</span>
+                    </div>
+                    <div class="age-option" onclick="selectAge(6)">
+                        <img src="https://img.icons8.com/color/144/000000/6.png" alt="6 years">
+                        <span>6 Years</span>
+                    </div>
+                    <div class="age-option" onclick="selectAge(7)">
+                        <img src="https://img.icons8.com/color/144/000000/7.png" alt="7 years">
+                        <span>7 Years</span>
+                    </div>
+                    <div class="age-option" onclick="selectAge(8)">
+                        <img src="https://img.icons8.com/color/144/000000/8.png" alt="8 years">
+                        <span>8 Years</span>
+                    </div>
+                    <div class="age-option" onclick="selectAge(9)">
+                        <img src="https://img.icons8.com/color/144/000000/9.png" alt="9 years">
+                        <span>9 Years</span>
+                    </div>
+                    <input type="hidden" id="age" name="age" value="">
+                </div>
+            </div>
+            
+            <button type="submit" class="start-button">Begin Quest!</button>
+        </form>
+    </div>
+
+    <!-- Adventure Characters (Larger Sizes) -->
+    <img src="https://img.icons8.com/color/192/000000/children.png" alt="Explorer" class="adventure-character" id="explorer">
+    <img src="https://img.icons8.com/color/192/000000/robot.png" alt="Robot Guide" class="adventure-character" id="robot">
+    <img src="https://img.icons8.com/color/192/000000/dinosaur.png" alt="Dino Friend" class="adventure-character" id="dino">
+    <img src="https://img.icons8.com/color/192/000000/alien.png" alt="Alien Buddy" class="adventure-character" id="alien">
+    <img src="https://img.icons8.com/color/192/000000/unicorn.png" alt="Magic Unicorn" class="adventure-character" id="unicorn">
+
+    <script>
+        // Select adventure level
+        function selectLevel(level) {
+            document.getElementById('adventureLevel').value = level;
+            // Remove selected class from all options
+            document.querySelectorAll('.level-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            // Add selected class to clicked option
+            event.currentTarget.classList.add('selected');
+            // Show age selection
+            document.getElementById('ageSelection').style.display = 'block';
+            
+            // Make characters celebrate
+            animateCharacters();
+        }
+        
+        // Select age
+        function selectAge(age) {
+            document.getElementById('age').value = age;
+            // Remove selected class from all options
+            document.querySelectorAll('.age-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            // Add selected class to clicked option
+            event.currentTarget.classList.add('selected');
+        }
+        
+        // Animate characters when level is selected
+        function animateCharacters() {
+            const characters = document.querySelectorAll('.adventure-character');
+            characters.forEach((char, index) => {
+                char.style.animation = 'celebrate 0.8s ease ' + (index * 0.15) + 's';
+            });
+            
+            // Add temporary celebration animation
+            const style = document.createElement('style');
+            style.innerHTML = `
+                @keyframes celebrate {
+                    0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+                    25% { transform: translateY(-40px) rotate(10deg) scale(1.1); }
+                    50% { transform: translateY(0) rotate(-10deg) scale(1); }
+                    75% { transform: translateY(-20px) rotate(5deg) scale(1.05); }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Remove after animation
+            setTimeout(() => {
+                document.head.removeChild(style);
+                resetCharacterAnimations();
+            }, 2000);
+        }
+        
+        // Reset character animations
+        function resetCharacterAnimations() {
+            document.querySelectorAll('.adventure-character').forEach(char => {
+                char.style.animation = '';
+            });
+        }
+        
+        // Form submission with age+level routing
+        document.getElementById('adventureForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const heroName = document.getElementById('heroName').value;
+            const adventureLevel = document.getElementById('adventureLevel').value;
+            const age = document.getElementById('age').value;
+            
+            if (!heroName || !adventureLevel || !age) {
+                alert('Please complete all the fields to begin your quest!');
+                return;
+            }
+            
+            // Store adventure data
+            localStorage.setItem('adventureProfile', JSON.stringify({
+                heroName,
+                adventureLevel,
+                age
+            }));
+            
+            // Create the target page name
+            const pageName = `level${adventureLevel}-age${age}.html`;
+            
+            // Redirect to the appropriate resource page
+            window.location.href = `resources/${pageName}?name=${encodeURIComponent(heroName)}&level=${adventureLevel}&age=${age}`;
+            
+            /* For testing before creating all pages:
+            alert(`Would redirect to: resources/${pageName}`);
+            window.location.href = `template-resource.html?level=${adventureLevel}&age=${age}&name=${encodeURIComponent(heroName)}`;
+            */
+        });
+        
+        // Make characters move with mouse (more pronounced movement)
+        document.addEventListener('mousemove', function(e) {
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+            
+            document.getElementById('explorer').style.transform = 
+                `translate(${x * 40 - 20}px, ${y * 40 - 20}px) rotate(${x * 10 - 5}deg)`;
+            document.getElementById('robot').style.transform = 
+                `translate(${x * -30 + 15}px, ${y * -30 + 15}px) rotate(${x * -5 + 2.5}deg)`;
+            document.getElementById('dino').style.transform = 
+                `translate(${x * -50 + 25}px, ${y * 50 - 25}px) rotate(${x * -15 + 7.5}deg)`;
+            document.getElementById('alien').style.transform = 
+                `translate(${x * 60 - 30}px, ${y * -40 + 20}px) rotate(${x * 20 - 10}deg)`;
+            document.getElementById('unicorn').style.transform = 
+                `translate(${x * 30 - 15}px, ${y * 60 - 30}px) rotate(${x * 15 - 7.5}deg)`;
+        });
+    </script>
+</body>
+</html>

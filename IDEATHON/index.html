@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Face-Scan Avatar</title>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+        }
+        #app {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .header {
+            background: linear-gradient(to right, #833ab4, #fd1d1d);
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        .section {
+            display: none;
+            flex: 1;
+            padding: 20px;
+            flex-direction: column;
+            align-items: center;
+        }
+        .active {
+            display: flex;
+        }
+        #video-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-bottom: 20px;
+        }
+        #video {
+            width: 100%;
+            border-radius: 10px;
+            transform: scaleX(-1); /* Mirror effect */
+            display: none;
+        }
+        #overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+        }
+        #avatar-container {
+            width: 100%;
+            height: 400px;
+            background: #eee;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        #avatar-canvas {
+            width: 100%;
+            height: 100%;
+        }
+        .btn {
+            background: #3897f0;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            margin: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .control-group {
+            margin-bottom: 15px;
+        }
+        .control-title {
+            margin: 0 0 10px 0;
+            color: #555;
+        }
+        .options {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .option {
+            padding: 8px 15px;
+            background: #f0f0f0;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .option.selected {
+            background: #3897f0;
+            color: white;
+        }
+        #loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 18px;
+            z-index: 100;
+        }
+        #loading-spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3897f0;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #instructions {
+            margin: 15px 0;
+            text-align: center;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="header">
+            <h1>3D Face-Scan Avatar</h1>
+        </div>
+
+        <div id="scan-section" class="section active">
+            <div id="video-container">
+                <video id="video" width="500" height="375" autoplay muted playsinline></video>
+                <canvas id="overlay" width="500" height="375"></canvas>
+            </div>
+            <div id="instructions">
+                Position your face in the center and click "Scan My Face"
+            </div>
+            <button id="scan-btn" class="btn">Scan My Face</button>
+        </div>
+
+        <div id="customize-section" class="section">
+            <div id="avatar-container">
+                <canvas id="avatar-canvas"></canvas>
+            </div>
+            <div class="controls">
+                <div class="control-group">
+                    <div class="control-title">Hair Style</div>
+                    <div class="options">
+                        <div class="option selected" data-style="short">Short</div>
+                        <div class="option" data-style="long">Long</div>
+                        <div class="option" data-style="curly">Curly</div>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <div class="control-title">Hair Color</div>
+                    <div class="options">
+                        <div class="option selected" data-color="#000000">Black</div>
+                        <div class="option" data-color="#654321">Brown</div>
+                        <div class="option" data-color="#FFD700">Blonde</div>
+                    </div>
+                </div>
+                <button id="download-btn" class="btn">Download Avatar</button>
+            </div>
+        </div>
+
+        <div id="loading">
+            <div id="loading-spinner"></div>
+            <div>Loading face detection models...</div>
+        </div>
+    </div>
+
+    <script>
+        // State management
+        const state = {
+            faceDetectionReady: false,
+            faceFeatures: null,
+            avatar: {
+                skinColor: '#FFDBAC',
+                hairStyle: 'short',
+                hairColor: '#000000'
+            },
+            threeJS: {
+                scene: null,
+                camera: null,
+                renderer: null,
+                head: null,
+                hair: null,
+                controls: null
+            }
+        };
+
+        // Initialize the application
+        async function initApp() {
+            try {
+                // Load face detection models
+                await loadFaceDetectionModels();
+               
+                // Start camera
+                await startCamera();
+               
+                // Hide loading screen
+                document.getElementById('loading').style.display = 'none';
+            } catch (error) {
+                console.error("Initialization error:", error);
+                document.getElementById('loading').innerHTML = `
+                    <div style="color: #ff6b6b; margin-bottom: 20px;">Error: ${error.message}</div>
+                    <div>Using default avatar instead</div>
+                `;
+                setTimeout(() => {
+                    document.getElementById('loading').style.display = 'none';
+                    generateDefaultAvatar();
+                }, 3000);
+            }
+        }
+
+        // Load face-api.js models
+        async function loadFaceDetectionModels() {
+            try {
+                // Show loading progress
+                document.getElementById('loading').children[1].textContent = "Loading face detection model...";
+               
+                await faceapi.nets.tinyFaceDetector.loadFromUri('https://justadudewhohacks.github.io/face-api.js/models');
+                await faceapi.nets.faceLandmark68Net.loadFromUri('https://justadudewhohacks.github.io/face-api.js/models');
+               
+                state.faceDetectionReady = true;
+            } catch (error) {
+                throw new Error("Failed to load face detection models");
+            }
+        }
+
+        // Start camera with error handling
+        async function startCamera() {
+            try {
+                const video = document.getElementById('video');
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: 'user',
+                        width: { ideal: 500 },
+                        height: { ideal: 375 }
+                    },
+                    audio: false
+                });
+                video.srcObject = stream;
+                video.style.display = 'block';
+               
+                // Wait for video to be ready
+                await new Promise((resolve) => {
+                    video.onplaying = resolve;
+                });
+               
+                // Set up face detection overlay dimensions
+                faceapi.matchDimensions(document.getElementById('overlay'), {
+                    width: video.videoWidth,
+                    height: video.videoHeight
+                });
+            } catch (error) {
+                throw new Error("Camera access denied or not available");
+            }
+        }
+
+        // Scan face button handler
+        document.getElementById('scan-btn').addEventListener('click', async function() {
+            if (!state.faceDetectionReady) {
+                alert("Face detection is still loading. Please wait...");
+                return;
+            }
+
+            // Show loading during processing
+            document.getElementById('loading').style.display = 'flex';
+            document.getElementById('loading').children[1].textContent = "Detecting face features...";
+           
+            try {
+                const video = document.getElementById('video');
+                const overlay = document.getElementById('overlay');
+               
+                // Detect face with landmarks
+                const detections = await faceapi.detectAllFaces(
+                    video,
+                    new faceapi.TinyFaceDetectorOptions()
+                ).withFaceLandmarks();
+               
+                if (detections.length === 0) {
+                    throw new Error("No face detected. Please try again with better lighting.");
+                }
+
+                // Get the most prominent face
+                const face = detections[0];
+               
+                // Draw landmarks on overlay
+                const resizedDetections = faceapi.resizeResults(face, {
+                    width: video.videoWidth,
+                    height: video.videoHeight
+                });
+               
+                // Clear previous drawings
+                const ctx = overlay.getContext('2d');
+                ctx.clearRect(0, 0, overlay.width, overlay.height);
+               
+                // Draw face landmarks
+                faceapi.draw.drawFaceLandmarks(overlay, resizedDetections);
+               
+                // Analyze face features
+                analyzeFaceFeatures(face.landmarks);
+               
+                // Generate avatar
+                generateAvatarFromFace();
+               
+                // Switch to customization view
+                document.getElementById('scan-section').classList.remove('active');
+                document.getElementById('customize-section').classList.add('active');
+               
+            } catch (error) {
+                alert(error.message);
+                generateDefaultAvatar();
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        });
+
+        // Analyze facial features
+        function analyzeFaceFeatures(landmarks) {
+            const jaw = landmarks.getJawOutline();
+            const leftEye = landmarks.getLeftEye();
+            const rightEye = landmarks.getRightEye();
+            const nose = landmarks.getNose();
+            const mouth = landmarks.getMouth();
+           
+            // Calculate face shape
+            const jawWidth = jaw[9].x - jaw[0].x;
+            const faceHeight = jaw[8].y - landmarks.positions[27].y;
+            const faceRatio = jawWidth / faceHeight;
+           
+            state.faceFeatures = {
+                faceShape: faceRatio > 1.25 ? 'round' : faceRatio < 0.85 ? 'long' : 'oval',
+                eyeShape: calculateEyeShape(leftEye, rightEye),
+                noseWidth: nose[3].x - nose[1].x,
+                noseHeight: nose[6].y - nose[0].y,
+                mouthWidth: mouth[9].x - mouth[0].x,
+                mouthHeight: mouth[6].y - mouth[0].y
+            };
+        }
+
+        function calculateEyeShape(leftEye, rightEye) {
+            const leftRatio = (leftEye[4].y - leftEye[1].y) / (leftEye[3].x - leftEye[0].x);
+            const rightRatio = (rightEye[4].y - rightEye[1].y) / (rightEye[3].x - rightEye[0].x);
+            const avgRatio = (leftRatio + rightRatio) / 2;
+           
+            if (avgRatio > 0.4) return 'round';
+            return 'almond';
+        }
+
+        // Generate avatar from face features
+        function generateAvatarFromFace() {
+            // Set skin tone
+            state.avatar.skinColor = '#FFDBAC';
+           
+            // Set initial hair style based on face shape
+            if (state.faceFeatures.faceShape === 'round') {
+                state.avatar.hairStyle = 'long';
+            } else {
+                state.avatar.hairStyle = 'short';
+            }
+           
+            // Initialize Three.js scene
+            init3DAvatar();
+        }
+
+        // Fallback avatar
+        function generateDefaultAvatar() {
+            state.avatar = {
+                skinColor: '#FFDBAC',
+                hairStyle: 'short',
+                hairColor: '#000000'
+            };
+           
+            state.faceFeatures = {
+                faceShape: 'oval',
+                eyeShape: 'almond',
+                noseWidth: 40,
+                noseHeight: 50,
+                mouthWidth: 60,
+                mouthHeight: 15
+            };
+           
+            init3DAvatar();
+            document.getElementById('scan-section').classList.remove('active');
+            document.getElementById('customize-section').classList.add('active');
+        }
+
+        // Three.js Implementation
+        function init3DAvatar() {
+            const container = document.getElementById('avatar-canvas');
+           
+            // Clear previous scene if exists
+            if (state.threeJS.renderer) {
+                container.removeChild(state.threeJS.renderer.domElement);
+            }
+           
+            // Scene setup
+            state.threeJS.scene = new THREE.Scene();
+            state.threeJS.scene.background = new THREE.Color(0xf0f0f0);
+           
+            // Camera setup
+            state.threeJS.camera = new THREE.PerspectiveCamera(
+                45,
+                container.clientWidth / container.clientHeight,
+                0.1,
+                1000
+            );
+            state.threeJS.camera.position.set(0, 1, 2);
+           
+            // Renderer setup - CRITICAL FIX: Attach to correct canvas
+            state.threeJS.renderer = new THREE.WebGLRenderer({
+                antialias: true,
+                canvas: container
+            });
+            state.threeJS.renderer.setPixelRatio(window.devicePixelRatio);
+            state.threeJS.renderer.setSize(container.clientWidth, container.clientHeight);
+           
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            state.threeJS.scene.add(ambientLight);
+           
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(1, 1, 1);
+            state.threeJS.scene.add(directionalLight);
+           
+            // Controls
+            state.threeJS.controls = new THREE.OrbitControls(state.threeJS.camera, state.threeJS.renderer.domElement);
+            state.threeJS.controls.enableDamping = true;
+            state.threeJS.controls.dampingFactor = 0.05;
+           
+            // Create avatar
+            createAvatarMesh();
+           
+            // Animation loop
+            function animate() {
+                requestAnimationFrame(animate);
+                state.threeJS.controls.update();
+                state.threeJS.renderer.render(state.threeJS.scene, state.threeJS.camera);
+            }
+            animate();
+           
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                state.threeJS.camera.aspect = container.clientWidth / container.clientHeight;
+                state.threeJS.camera.updateProjectionMatrix();
+                state.threeJS.renderer.setSize(container.clientWidth, container.clientHeight);
+            });
+        }
+
+        function createAvatarMesh() {
+            // Clear existing mesh
+            if (state.threeJS.head) state.threeJS.scene.remove(state.threeJS.head);
+            if (state.threeJS.hair) state.threeJS.scene.remove(state.threeJS.hair);
+           
+            // Create head based on face shape
+            let headGeometry;
+            switch(state.faceFeatures.faceShape) {
+                case 'round':
+                    headGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+                    break;
+                case 'long':
+                    headGeometry = new THREE.CylinderGeometry(0.4, 0.4, 0.8, 32);
+                    break;
+                default: // oval
+                    headGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+                    headGeometry.scale(1, 1.2, 1);
+            }
+           
+            state.threeJS.head = new THREE.Mesh(
+                headGeometry,
+                new THREE.MeshStandardMaterial({
+                    color: new THREE.Color(state.avatar.skinColor),
+                    roughness: 0.3
+                })
+            );
+            state.threeJS.head.position.y = 0.5;
+            state.threeJS.scene.add(state.threeJS.head);
+           
+            // Create facial features
+            addFacialFeatures();
+           
+            // Create hair
+            updateHair();
+        }
+
+        function addFacialFeatures() {
+            // Eyes
+            const eyeGeometry = state.faceFeatures.eyeShape === 'round' ?
+                new THREE.SphereGeometry(0.07, 16, 16) :
+                new THREE.SphereGeometry(0.07, 16, 16, 0, Math.PI * 2, 0, Math.PI * 0.7);
+           
+            // Left eye
+            const leftEye = new THREE.Mesh(
+                eyeGeometry,
+                new THREE.MeshStandardMaterial({ color: 0x000000 })
+            );
+            leftEye.position.set(-0.15, 0.55, 0.45);
+            state.threeJS.scene.add(leftEye);
+           
+            // Right eye
+            const rightEye = new THREE.Mesh(
+                eyeGeometry,
+                new THREE.MeshStandardMaterial({ color: 0x000000 })
+            );
+            rightEye.position.set(0.15, 0.55, 0.45);
+            state.threeJS.scene.add(rightEye);
+           
+            // Nose
+            const nose = new THREE.Mesh(
+                new THREE.ConeGeometry(0.05, 0.2, 4),
+                new THREE.MeshStandardMaterial({ color: 0xFFDBAC })
+            );
+            nose.position.set(0, 0.45, 0.5);
+            nose.rotation.x = Math.PI/2;
+            state.threeJS.scene.add(nose);
+           
+            // Mouth
+            const mouth = new THREE.Mesh(
+                new THREE.SphereGeometry(0.2, 16, 16, 0, Math.PI, 0, Math.PI * 0.5),
+                new THREE.MeshStandardMaterial({ color: 0x880000 })
+            );
+            mouth.position.set(0, 0.4, 0.45);
+            mouth.rotation.x = Math.PI * 0.2;
+            state.threeJS.scene.add(mouth);
+        }
+
+        function updateHair() {
+            if (state.threeJS.hair) state.threeJS.scene.remove(state.threeJS.hair);
+           
+            const hairMaterial = new THREE.MeshStandardMaterial({
+                color: new THREE.Color(state.avatar.hairColor),
+                roughness: 0.8
+            });
+           
+            switch(state.avatar.hairStyle) {
+                case 'long':
+                    state.threeJS.hair = new THREE.Mesh(
+                        new THREE.ConeGeometry(0.55, 0.7, 32),
+                        hairMaterial
+                    );
+                    state.threeJS.hair.position.set(0, 0.8, 0);
+                    state.threeJS.hair.rotation.x = Math.PI;
+                    break;
+               
+                case 'curly':
+                    const hairGroup = new THREE.Group();
+                    for (let i = 0; i < 25; i++) {
+                        const curl = new THREE.Mesh(
+                            new THREE.SphereGeometry(0.1 + Math.random() * 0.05, 8, 8),
+                            hairMaterial
+                        );
+                        curl.position.set(
+                            (Math.random() - 0.5) * 0.5,
+                            0.5 + Math.random() * 0.3,
+                            (Math.random() - 0.5) * 0.5
+                        );
+                        hairGroup.add(curl);
+                    }
+                    state.threeJS.hair = hairGroup;
+                    break;
+               
+                default: // short
+                    state.threeJS.hair = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.52, 32, 32, 0, Math.PI * 2, 0, Math.PI * 0.5),
+                        hairMaterial
+                    );
+                    state.threeJS.hair.position.y = 0.5;
+            }
+           
+            state.threeJS.scene.add(state.threeJS.hair);
+        }
+
+        // UI Event Listeners
+        document.querySelectorAll('.option[data-style]').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.option[data-style]').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                this.classList.add('selected');
+                state.avatar.hairStyle = this.getAttribute('data-style');
+                updateHair();
+            });
+        });
+
+        document.querySelectorAll('.option[data-color]').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.option[data-color]').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                this.classList.add('selected');
+                state.avatar.hairColor = this.getAttribute('data-color');
+                updateHair();
+            });
+        });
+
+        document.getElementById('download-btn').addEventListener('click', function() {
+            const link = document.createElement('a');
+            link.download = 'my-avatar.png';
+            state.threeJS.renderer.domElement.toBlob(function(blob) {
+                link.href = URL.createObjectURL(blob);
+                link.click();
+            }, 'image/png');
+        });
+
+        // Start the application
+        initApp();
+    </script>
+</body>
+</html>

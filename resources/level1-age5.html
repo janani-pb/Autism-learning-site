@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enchanted Learning Kingdom</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --math: #FF6B6B;
+            --science: #4FC3F7;
+            --reading: #FFD166;
+            --arts: #AB47BC;
+            --cooking: #66BB6A;
+            --creative: #FF8E53;
+        }
+
+        body {
+            margin: 0;
+            overflow-x: hidden;
+            font-family: 'Comic Neue', cursive;
+            background: linear-gradient(to bottom, #a1c4fd, #c2e9fb);
+            min-height: 100vh;
+            cursor: url('https://img.icons8.com/color/48/000000/fairy.png'), auto;
+        }
+
+        /* 🌈 Animated Sky Background */
+        .sky {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: linear-gradient(to bottom, #a1c4fd, #c2e9fb);
+        }
+
+        .cloud {
+            position: absolute;
+            background: url('https://img.icons8.com/color/96/000000/cloud.png') no-repeat;
+            background-size: contain;
+            opacity: 0.8;
+            animation: floatCloud linear infinite;
+        }
+
+        @keyframes floatCloud {
+            0% { transform: translateX(-150px); }
+            100% { transform: translateX(calc(100vw + 150px)); }
+        }
+
+        /* 🏰 Kingdom Castle */
+        .kingdom-castle {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 400px;
+            height: 400px;
+            background: url('https://img.icons8.com/color/480/000000/castle.png') bottom center no-repeat;
+            background-size: contain;
+            z-index: 5;
+        }
+
+        /* 🎪 Title Banner */
+        .title-banner {
+            background: url('https://img.icons8.com/color/480/000000/scroll.png') center no-repeat;
+            background-size: contain;
+            width: 80%;
+            height: 200px;
+            margin: 20px auto 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3));
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 {
+            font-family: 'Fredoka One', cursive;
+            color: #8e44ad;
+            font-size: 3rem;
+            margin: 0;
+            text-shadow: 3px 3px 0 #f1c40f;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            color: #d35400;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+
+        /* 🏕️ Fantasy Learning Towers */
+        .learning-towers {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            padding: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        .tower {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+            border-bottom: 8px solid var(--color);
+            animation: float 4s ease-in-out infinite;
+            backdrop-filter: blur(5px);
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+
+        .tower:hover {
+            transform: translateY(-15px) rotate(5deg);
+            box-shadow: 0 25px 40px rgba(0,0,0,0.3);
+        }
+
+        .tower-icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.2));
+        }
+
+        .tower:hover .tower-icon {
+            transform: scale(1.3) rotate(15deg);
+            animation: pulse 1s infinite alternate;
+        }
+
+        .tower-name {
+            font-family: 'Fredoka One', cursive;
+            color: var(--color);
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+        }
+
+        .tower-desc {
+            color: #555;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+
+        .tower-character {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            bottom: 10px;
+            right: 10px;
+            opacity: 0.8;
+            transition: all 0.3s ease;
+        }
+
+        .tower:hover .tower-character {
+            transform: scale(1.2);
+            opacity: 1;
+            animation: bounce 0.5s infinite alternate;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-25px); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1.3); }
+            100% { transform: scale(1.4); }
+        }
+
+        @keyframes bounce {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-10px); }
+        }
+
+        /* 🧚 Fairy Guide */
+        .fairy-guide {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 150px;
+            cursor: pointer;
+            z-index: 100;
+            animation: float 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 20px #f1c40f);
+            transition: all 0.3s ease;
+        }
+
+        .fairy-guide:hover {
+            transform: scale(1.1);
+        }
+
+        /* 🦄 Fantasy Characters */
+        .fantasy-character {
+            position: fixed;
+            z-index: -1;
+            pointer-events: none;
+            animation: floatSide linear infinite;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.4));
+        }
+
+        @keyframes floatSide {
+            0% { transform: translateX(-100px); }
+            100% { transform: translateX(calc(100vw + 100px)); }
+        }
+
+        /* ✨ Sparkles */
+        .sparkle {
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            background: url('https://img.icons8.com/color/48/000000/star.png') no-repeat;
+            background-size: contain;
+            pointer-events: none;
+            z-index: 20;
+            opacity: 0;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .learning-towers {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+            
+            .tower {
+                padding: 20px;
+            }
+            
+            .tower-icon {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .title-banner {
+                height: 150px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 🌈 Animated Sky Background -->
+    <div class="sky" id="sky"></div>
+    
+    <!-- 🏰 Kingdom Castle -->
+    <div class="kingdom-castle"></div>
+    
+    <!-- 🦄 Fantasy Characters -->
+    <img src="https://img.icons8.com/color/96/000000/unicorn.png" class="fantasy-character" 
+         style="top: 10%; animation-duration: 30s; animation-delay: 2s; width: 120px;">
+    <img src="https://img.icons8.com/color/96/000000/dragon.png" class="fantasy-character" 
+         style="top: 60%; animation-duration: 35s; animation-delay: 5s; width: 150px;">
+    <img src="https://img.icons8.com/color/96/000000/wizard.png" class="fantasy-character" 
+         style="top: 35%; animation-duration: 25s; animation-delay: 0s; width: 100px;">
+    <img src="https://img.icons8.com/color/96/000000/fairy.png" class="fantasy-character" 
+         style="top: 20%; animation-duration: 22s; animation-delay: 3s; width: 90px;">
+    <img src="https://img.icons8.com/color/96/000000/knight.png" class="fantasy-character" 
+         style="top: 70%; animation-duration: 28s; animation-delay: 4s; width: 110px;">
+
+    <!-- 🎪 Title Banner -->
+    <div class="title-banner">
+        <h1>Enchanted Learning Kingdom</h1>
+        <div class="subtitle">Visit the magical learning towers!</div>
+    </div>
+
+    <!-- 🏰 Fantasy Learning Towers -->
+    <div class="learning-towers">
+        <!-- Math Tower -->
+        <div class="tower" style="--color: var(--math);" onclick="enterActivity('math')">
+            <img src="https://img.icons8.com/color/96/000000/math.png" class="tower-icon">
+            <div class="tower-name">Wizard's Arithmetic</div>
+            <div class="tower-desc">Solve magical number puzzles</div>
+            <img src="https://img.icons8.com/color/96/000000/wizard.png" class="tower-character">
+        </div>
+        
+        <!-- Science Tower -->
+        <div class="tower" style="--color: var(--science);" onclick="enterActivity('science')">
+            <img src="art1.webp" class="tower-icon">
+            <div class="tower-name">Alchemist's Lab</div>
+            <div class="tower-desc">Brew magical potions</div>
+            <img src="art2.webp" class="tower-character">
+        </div>
+        
+        <!-- Reading Tower -->
+        <div class="tower" style="--color: var(--reading);" onclick="enterActivity('reading')">
+            <img src="https://img.icons8.com/color/96/000000/book.png" class="tower-icon">
+            <div class="tower-name">Storyteller's Keep</div>
+            <div class="tower-desc">Discover enchanted tales</div>
+            <img src="https://img.icons8.com/color/96/000000/story-book.png" class="tower-character">
+        </div>
+        
+        <!-- Arts Tower -->
+        <div class="tower" style="--color: var(--arts);" onclick="enterActivity('arts')">
+            <img src="https://img.icons8.com/color/96/000000/paint-palette.png" class="tower-icon">
+            <div class="tower-name">Artist's Enclave</div>
+            <div class="tower-desc">Paint magical creatures</div>
+            <img src="https://img.icons8.com/color/96/000000/artist.png" class="tower-character">
+        </div>
+        
+        <!-- Cooking Tower -->
+        <div class="tower" style="--color: var(--cooking);" onclick="enterActivity('cooking')">
+            <img src="https://img.icons8.com/color/96/000000/cooking.png" class="tower-icon">
+            <div class="tower-name">Royal Kitchen</div>
+            <div class="tower-desc">Cook magical feasts</div>
+            <img src="https://img.icons8.com/color/96/000000/chef-hat.png" class="tower-character">
+        </div>
+        
+        <!-- Creative Tower -->
+        <div class="tower" style="--color: var(--creative);" onclick="enterActivity('creative')">
+            <img src="https://img.icons8.com/color/96/000000/idea.png" class="tower-icon">
+            <div class="tower-name">Dreamweaver's Tower</div>
+            <div class="tower-desc">Bring imagination to life</div>
+            <img src="https://img.icons8.com/color/96/000000/fairy.png" class="tower-character">
+        </div>
+    </div>
+    
+    <!-- 🧚 Interactive Fairy Guide -->
+    <img src="https://img.icons8.com/color/144/000000/fairy.png" class="fairy-guide" 
+         alt="Fairy Guide" onclick="fairySpeak()">
+
+    <script>
+        // 🌈 Create animated clouds
+        function createSky() {
+            const sky = document.getElementById('sky');
+            for (let i = 0; i < 12; i++) {
+                const cloud = document.createElement('div');
+                cloud.classList.add('cloud');
+                cloud.style.width = `${Math.random() * 120 + 60}px`;
+                cloud.style.height = `${Math.random() * 80 + 40}px`;
+                cloud.style.top = `${Math.random() * 80}%`;
+                cloud.style.left = `${Math.random() * 100}%`;
+                cloud.style.animationDuration = `${Math.random() * 50 + 30}s`;
+                cloud.style.animationDelay = `${Math.random() * 15}s`;
+                sky.appendChild(cloud);
+            }
+        }
+        
+        // ✨ Create sparkle effect
+        function createSparkles(x, y, count, color) {
+            for (let i = 0; i < count; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.classList.add('sparkle');
+                sparkle.style.left = `${x + (Math.random() - 0.5) * 60}px`;
+                sparkle.style.top = `${y + (Math.random() - 0.5) * 60}px`;
+                sparkle.style.transform = `scale(${Math.random() * 0.7 + 0.7}) rotate(${Math.random() * 360}deg)`;
+                sparkle.style.opacity = '1';
+                if (color) sparkle.style.filter = `hue-rotate(${Math.random() * 360}deg) brightness(1.2)`;
+                document.body.appendChild(sparkle);
+                
+                // Animate sparkle
+                const duration = 1000 + Math.random() * 1500;
+                sparkle.animate([
+                    { transform: 'scale(0.5) rotate(0deg)', opacity: 0 },
+                    { transform: 'scale(1.5) rotate(180deg)', opacity: 1 },
+                    { transform: 'scale(0.8) rotate(360deg)', opacity: 0 }
+                ], { 
+                    duration: duration,
+                    easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+                });
+                
+                // Remove after animation
+                setTimeout(() => sparkle.remove(), duration);
+            }
+        }
+        
+        // 🧚 Fairy speaks when clicked
+        function fairySpeak() {
+            const messages = [
+                "Welcome to the Enchanted Learning Kingdom!",
+                "Each tower holds magical knowledge!",
+                "I'm Twinkle, your guide fairy!",
+                "The Wizard's Arithmetic tower has number spells!",
+                "The Alchemist's Lab brews knowledge potions!",
+                "The Storyteller's Keep has dragon tales!",
+                "The Artist's Enclave paints unicorns!",
+                "The Royal Kitchen prepares magical feasts!",
+                "The Dreamweaver's Tower makes imagination real!"
+            ];
+            const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+            
+            // Create sparkles around fairy
+            const fairy = document.querySelector('.fairy-guide');
+            const rect = fairy.getBoundingClientRect();
+            createSparkles(rect.left + rect.width/2, rect.top + rect.height/2, 20, true);
+            
+            // Fairy bounce animation
+            fairy.animate([
+                { transform: 'translateY(0)' },
+                { transform: 'translateY(-20px)' },
+                { transform: 'translateY(0)' }
+            ], { duration: 300, iterations: 3 });
+            
+            // Use speech synthesis if available
+            if ('speechSynthesis' in window) {
+                const speech = new SpeechSynthesisUtterance(randomMessage);
+                speech.rate = 0.9;
+                speech.pitch = 1.5;
+                speech.volume = 0.8;
+                window.speechSynthesis.speak(speech);
+            }
+        }
+        
+        // 🏰 Enter a learning activity
+        function enterActivity(subject) {
+            // Get user data from URL
+            const params = new URLSearchParams(window.location.search);
+            const heroName = params.get('name') || 'Young Explorer';
+            const level = params.get('level') || '1';
+            const age = params.get('age') || '5';
+            
+            // Create sparkle explosion
+            const element = event.currentTarget;
+            const rect = element.getBoundingClientRect();
+            createSparkles(rect.left + rect.width/2, rect.top + rect.height/2, 40, true);
+            
+            // Tower lift animation
+            element.style.animation = 'none';
+            element.style.transform = 'translateY(-50px) scale(1.1)';
+            element.style.boxShadow = '0 30px 50px rgba(0,0,0,0.4)';
+            element.style.zIndex = '100';
+            
+            setTimeout(() => {
+                element.style.transform = 'translateY(-100px) scale(0.9)';
+                element.style.opacity = '0.7';
+            }, 300);
+            
+            // Redirect after animation
+            setTimeout(() => {
+                const pages = {
+                    math: 'wizards-arithmetic',
+                    science: 'alchemists-lab',
+                    reading: 'storytellers-keep',
+                    arts: 'artists-enclave',
+                    cooking: 'royal-kitchen',
+                    creative: 'dreamweavers-tower'
+                };
+                window.location.href = `${pages[subject]}.html?name=${heroName}&level=${level}&age=${age}`;
+            }, 800);
+        }
+        
+        // Create sparkles when mouse moves
+        document.addEventListener('mousemove', (e) => {
+            if (Math.random() > 0.85) {
+                createSparkles(e.clientX, e.clientY, 2, true);
+            }
+        });
+        
+        // Initialize
+        window.onload = () => {
+            createSky();
+            
+            // Fairy greets after 2 seconds
+            setTimeout(fairySpeak, 2000);
+            
+            // Make towers bounce with different delays
+            document.querySelectorAll('.tower').forEach((tower, index) => {
+                tower.style.animationDelay = `${index * 0.2}s`;
+            });
+            
+            // Add occasional random sparkles
+            setInterval(() => {
+                const x = Math.random() * window.innerWidth;
+                const y = Math.random() * window.innerHeight * 0.8;
+                createSparkles(x, y, 3, true);
+            }, 3000);
+        };
+    </script>
+</body>
+</html>
